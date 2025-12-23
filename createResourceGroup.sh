@@ -1,0 +1,1 @@
+az group create --name GitPlayground --location canadaeast --subscription 72453083-3ca3-4638-9779-89eca7e2fd83
