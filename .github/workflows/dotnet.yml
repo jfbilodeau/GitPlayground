@@ -37,14 +37,24 @@ jobs:
       run: |
         dotnet test --no-build --configuration Release --logger "trx;LogFileName=test_results.trx" --results-directory ./test-results
 
+    - name: Publish
+      run: dotnet publish --no-build --configuration Release -o ./publish
+
     - name: Azure Login
+      if: github.ref == 'refs/heads/main'
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Deploy Bicep template
       run: |
+        az group create --name GitPlayground --location canadaeast
         az deployment group create \
           --resource-group GitPlayground \
           --template-file infra/GitPlayground.bicep \
           --parameters location=canadaeast
+
+    - name: Deploy published app to Web App
+      run: |
+        echo "Deploying to web app: gitplayground in resource group: GitPlayground"
+        az webapp deploy --resource-group GitPlayground --name gitplayground --src-path ./publish
