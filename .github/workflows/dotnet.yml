@@ -37,9 +37,9 @@ jobs:
       run: |
         dotnet test --no-build --configuration Release --logger "trx;LogFileName=test_results.trx" --results-directory ./test-results
 
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: ./test-results
+    - name: Deploy Bicep template
+      run: |
+        az deployment group create \
+          --resource-group GitPlayground \
+          --template-file infra/GitPlayground.bicep \
+          --parameters location=canadaeast
