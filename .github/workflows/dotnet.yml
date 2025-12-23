@@ -54,7 +54,17 @@ jobs:
           --template-file infra/GitPlayground.bicep \
           --parameters location=canadaeast
 
-    - name: Deploy published app to Web App
+    - name: Ensure zip is installed
+      if: runner.os == 'Linux'
       run: |
-        echo "Deploying to web app: gitplayground in resource group: GitPlayground"
-        az webapp deploy --resource-group GitPlayground --name gitplayground --src-path ./publish
+        sudo apt-get update && sudo apt-get install -y zip
+
+    - name: Create ZIP of published output
+      run: |
+        cd ./publish
+        zip -r ../app.zip .
+
+    - name: Deploy published zip to Web App
+      run: |
+        echo "Deploying app.zip to web app: gitplayground in resource group: GitPlayground"
+        az webapp deploy --resource-group GitPlayground --name gitplayground --src-path ./app.zip
